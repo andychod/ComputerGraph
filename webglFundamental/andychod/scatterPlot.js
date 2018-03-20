@@ -55,20 +55,11 @@ function main() {
   for(var i=0; i<2; i++)
   {
     var Xaxis = [
-      210, 220,
-      480, 220,
-      210, 230,
-      210, 230,
-      480, 220,
-      480, 230,
+      200, 200,500,200
     ];
     var Yaxis = [
-      210, 220,
-      220, 220,
-      210, 490,
-      210, 490,
-      220, 490,
-      220, 220,
+      200, 200,
+      200, 500,
     ];
 
     if(i==0)
@@ -83,11 +74,45 @@ function main() {
     gl.uniform2f(resolutionUniformLocation, gl.canvas.width, gl.canvas.height); 
 
     // draw
-    var primitiveType = gl.TRIANGLES;
+    var primitiveType = gl.LINES;
     var offset = 0;
-    var count = 6;
+    var count = 2;
     gl.drawArrays(primitiveType, offset, count);
   }
+
+  /*var pp = [400,400
+      ];
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(pp), gl.STATIC_DRAW);
+  // Bind the position buffer.
+  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer); 
+
+  // set the resolution
+  gl.uniform2f(resolutionUniformLocation, gl.canvas.width, gl.canvas.height); 
+
+// draw
+    var primitiveType = gl.POINTS;
+    var offset = 0;
+    var count = 1;
+    gl.drawArrays(primitiveType, offset, count);*/
+
+  var ppoints;
+  for (var ii = 0; ii < 50; ++ii) {
+    // Setup a random rectangle
+    // This will write to positionBuffer because
+    // its the last thing we bound on the ARRAY_BUFFER
+    // bind point
+    ppoints = [220 + Math.floor(Math.random() * 250), 220 + Math.floor(Math.random() * 250)];
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(ppoints), gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer); 
+    gl.uniform2f(resolutionUniformLocation, gl.canvas.width, gl.canvas.height);
+
+    // Draw the rectangle.
+    var primitiveType = gl.POINTS;
+    var offset = 0;
+    var count = 1;
+    gl.drawArrays(primitiveType, offset, count);
+  }
+
 
 }
 
