@@ -51,56 +51,66 @@ function main() {
   gl.vertexAttribPointer(
       positionAttributeLocation, size, type, normalize, stride, offset)
 
-  // xy軸
-  for(var i=0; i<2; i++)
+  var originPoint = [200,500]; // 原點
+  var axisWidth = 600; // 軸寬
+  var axisHeight = 400; //軸長
+  var XNum = 10; // x軸的格線有幾條 -->一定要能整除axisWidth
+  var YNum = 10; // y軸的格線有幾條 -->一定要能整除axisHeight
+  DrawAxis(originPoint, axisWidth, axisHeight);
+
+  // 畫出xy軸
+  function DrawAxis(originPoint, axisWidth, axisHeight)
   {
+    var xWidth = 10; // x軸的寬度
+
     var Xaxis = [
-      200, 500,800,500
+      originPoint[0],originPoint[1], originPoint[0] + axisWidth,originPoint[1],
+      originPoint[0],originPoint[1]+ xWidth, originPoint[0] + axisWidth,originPoint[1]+ xWidth,
     ];
+    setGL(Xaxis, 4, gl.LINES);
+    for(var i=1; i<=XNum; i++)
+    {
+      var spacing = axisWidth / XNum;
+      var grid =[ originPoint[0] + i*spacing , originPoint[1]+ xWidth ,
+                  originPoint[0] + i*spacing , originPoint[1]];
+      setGL(grid, 2, gl.LINES);
+    }
+
+
     var Yaxis = [
-      200, 500,
-      200, 100,
+      originPoint[0],originPoint[1] + xWidth ,originPoint[0], originPoint[1] - axisHeight
       
     ];
-
-    if(i==0)
-      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(Xaxis), gl.STATIC_DRAW);
-    else
-      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(Yaxis), gl.STATIC_DRAW);
-
-    // Bind the position buffer.
-    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer); 
-
-    // set the resolution
-    gl.uniform2f(resolutionUniformLocation, gl.canvas.width, gl.canvas.height); 
-
-    // draw
-    var primitiveType = gl.LINES;
-    var offset = 0;
-    var count = 2;
-    gl.drawArrays(primitiveType, offset, count);
+    setGL(Yaxis, 2, gl.LINES);
+    for(var i=0; i<=YNum; i++)
+    {
+      var spacing = axisHeight / YNum;
+      var grid =[ originPoint[0] - xWidth , originPoint[1] - i*spacing ,
+                  originPoint[0] , originPoint[1] - i*spacing];
+      setGL(grid, 2, gl.LINES);
+    }
   }
 
-  function setGL(v, count)
+  function setGL(v, numOfPoints, glType)
   {
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(v), gl.STATIC_DRAW);
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer); 
     gl.uniform2f(resolutionUniformLocation, gl.canvas.width, gl.canvas.height);
 
     // Draw the rectangle.
-    var primitiveType = gl.LINE_STRIP;
+    var primitiveType = glType;
     var offset = 0;
-    gl.drawArrays(primitiveType, offset, count);
+    gl.drawArrays(primitiveType, offset, numOfPoints);
   }
 
   var line1 = [230, 400, 320, 380, 510, 360, 720, 300];
-  setGL(line1, 4);
+  setGL(line1, 4, gl.LINE_STRIP);
   var line2 = [230, 380, 320, 350, 510, 320, 720,270];
-  setGL(line2, 4);
+  setGL(line2, 4, gl.LINE_STRIP);
   var line3 = [230, 375, 320, 330, 510, 315, 720,265];
-  setGL(line3, 4);
+  setGL(line3, 4, gl.LINE_STRIP);
   var line4 = [230, 360, 320, 310, 510, 290, 720,240];
-  setGL(line4, 4);
+  setGL(line4, 4, gl.LINE_STRIP);
 
 
 }
