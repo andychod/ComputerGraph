@@ -1,62 +1,3 @@
-/*var mycanvas = new PIXI.Application(800, 600, { antialias: true ,backgroundColor : 0x4dffff});
-document.body.appendChild(mycanvas.view);
-
-// create the root of the scene graph
-var stage = new PIXI.Container();
-
-var graphics = new PIXI.Graphics();
-
-//畫出軸線
-graphics.lineStyle(5, 0x000000, 1);
-graphics.moveTo(50,50);
-graphics.lineTo(600, 50);
-graphics.moveTo(50,50);
-graphics.lineTo(50, 400);
-
-//將視覺區的底色刷白
-graphics.lineStyle(1, 0xffffff, 0);
-graphics.beginFill(0xffffff, 1);
-graphics.drawRect(50, 50, 550, 350);
-// set a fill and line style
-graphics.beginFill(0xFF3300);
-graphics.lineStyle(4, 0xffd900, 1);
-
-// draw a shape
-graphics.moveTo(0,0);
-graphics.lineTo(250, 50);
-graphics.lineTo(100, 100);
-graphics.lineTo(50, 50);
-graphics.endFill();
-
-// set a fill and a line style again and draw a rectangle
-graphics.lineStyle(2, 0x0000FF, 1);
-graphics.beginFill(0xFF700B, 1);
-graphics.drawRect(50, 250, 120, 120);
-
-// draw a rounded rectangle
-graphics.lineStyle(2, 0xFF00FF, 1);
-graphics.beginFill(0xFF00BB, 0.25);
-graphics.drawRoundedRect(150, 450, 300, 100, 15);
-graphics.endFill();
-
-// draw a circle, set the lineStyle to zero so the circle doesn't have an outline
-graphics.lineStyle(0);
-graphics.beginFill(0xFFFF0B, 0.5);
-graphics.drawCircle(470, 90,60);
-graphics.endFill();
-
-stage.addChild(graphics);
-
-
-var basicText = new PIXI.Text('Basic text in pixi');
-basicText.x = 30;
-basicText.y = 90;
-
-stage.addChild(basicText);
-mycanvas.render(stage);
-*/
-
-
 var renderer = PIXI.autoDetectRenderer(800, 600,{ antialias: true ,backgroundColor : 0x4dffff});
 document.body.appendChild(renderer.view);
 
@@ -66,49 +7,82 @@ var stage = new PIXI.Container();
 
 var graphics = new PIXI.Graphics();
 
+var origin = [100, 100];
+var width = 600;
+var height = 400;
+var xOffset = 70;
+var yOffset = 40;
+
 //畫出軸線
 graphics.lineStyle(5, 0x000000, 1);
-graphics.moveTo(50,50);
-graphics.lineTo(600, 50);
-graphics.moveTo(50,50);
-graphics.lineTo(50, 400);
+graphics.moveTo(origin[0],origin[1]);
+graphics.lineTo(origin[0]+width, origin[1]);
+graphics.moveTo(origin[0],origin[1]);
+graphics.lineTo(origin[0], origin[1] + height);
 
 //將視覺區的底色刷白
 graphics.lineStyle(1, 0xffffff, 0);
 graphics.beginFill(0xffffff, 1);
-graphics.drawRect(50, 50, 550, 350);
+graphics.drawRect(origin[0],origin[1], width, height);
 // set a fill and line style
 graphics.beginFill(0xFF3300);
 graphics.lineStyle(4, 0xffd900, 1);
-stage.addChild(graphics);
 graphics.endFill();
+stage.addChild(graphics);
 
-//畫出叢線
-var mycolor = ["0xff60af", "0x0000c6", "0x01b468", "0xffd306", "0x984b4b"];
-var n = Math.floor(Math.random()*10 + 5);
-
-for(var i=0; i<=n; i++)
+//x輔助線
+for(var i=1; i<9; i++)
 {
-	graphics.lineStyle(4, mycolor[i%5], 1);
-	var offsety = Math.floor(Math.random()*50 + 70);
-	graphics.moveTo(100,offsety);
-	for(var j=200 ;j<=500; j+=100)
-	{
-		offsety += Math.floor(Math.random()*63+20);
-		graphics.lineTo(j, offsety);
-	}
+	graphics.lineStyle(2, 0x01b468, 1);
+	graphics.moveTo(origin[0] + i * xOffset ,origin[1]);
+	graphics.lineTo(origin[0] + i * xOffset ,origin[1] + height);
 }
-/*graphics.moveTo(100,100);
-graphics.lineTo(200, 130);
-graphics.lineTo(300, 200);
-graphics.lineTo(400, 275);
-graphics.lineTo(500, 330);*/
+//y輔助線
+for(var i=0; i<9; i++)
+{
+	graphics.lineStyle(2, 0x01b468, 1);
+	graphics.moveTo(origin[0],origin[1]+yOffset + i*yOffset + 10);
+	graphics.lineTo(origin[0]+width,origin[1]+yOffset + i*yOffset + 10);
+}
+
+//設定標題文字
+var TitleText = new PIXI.Text('時序叢線圖');
+TitleText.x = 550;
+TitleText.y = 550;
+stage.addChild(TitleText);
+
+//設定x軸文字
+var stationName = ["01F0467S","01F0509S","01F0532S","01F0557S","01F0578S","01F0633S","01F0664S","01F0681S","01F0750S"];
+var style = new PIXI.TextStyle({
+    fontFamily: 'Arial',
+    fontSize: 16,
+    fontStyle: 'oblique',
+    fontWeight: 'bold',
+    //fill: ['#ffffff', '#00ff99'], // gradient
+    wordWrap: true,
+    wordWrapWidth: 440
+});
+for(var i=0; i<8; i++)
+{
+	var stationText = new PIXI.Text(stationName[i], style);
+	stationText.x = origin[0]+25 + i*xOffset;
+	stationText.y = origin[1]-65;
+	stationText.rotation += 0.7;
+	stage.addChild(stationText);
+}
+
+//設定y軸文字
+var timeName = ["00:00", "00:10", "00:20", "00:30", "00:40","00:50", "01:00","01:10","01:20"]
+for(var i=0; i<9; i++)
+{
+	var timeText = new PIXI.Text(timeName[i], style);
+	timeText.x = origin[0]-50;
+	timeText.y = origin[1]+yOffset + i*yOffset;
+	stage.addChild(timeText);
+}
 
 
-//設定文字
-var basicText = new PIXI.Text('時序叢線圖');
-basicText.x = 550;
-basicText.y = 550;
-stage.addChild(basicText);
+
+
 
 renderer.render(stage);
