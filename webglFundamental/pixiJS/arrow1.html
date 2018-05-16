@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/4.7.1/pixi.min.js"></script>
+  <head>
+  <body>
+    <script src="TestData.js"></script>
+    <script src="asixValue.js"></script>
+    <script>
+var app = new PIXI.Application(800, 600,{ antialias: true ,backgroundColor : 0x4dffff});
+document.body.appendChild(app.view);
+
+var graphics = new PIXI.Graphics();
+
+var origin = [100, 100];
+var width = 600;
+var height = 400;
+var xOffset = 70;
+var yOffset = 40;
+
+var dataGroup = new PIXI.Graphics();
+
+//畫出軸線
+graphics.lineStyle(5, 0x000000, 1);
+graphics.moveTo(origin[0],origin[1]);
+graphics.lineTo(origin[0]+width, origin[1]);
+graphics.moveTo(origin[0],origin[1]);
+graphics.lineTo(origin[0], origin[1] + height);
+
+//將視覺區的底色刷白
+graphics.lineStyle(1, 0xffffff, 0);
+graphics.beginFill(0xffffff, 1);
+graphics.drawRect(origin[0],origin[1], width, height);
+// set a fill and line style
+graphics.beginFill(0xFF3300);
+graphics.lineStyle(4, 0xffd900, 1);
+graphics.endFill();
+app.stage.addChild(graphics);
+
+//x輔助線
+for(var i=1; i<9; i++)
+{
+	graphics.lineStyle(2, 0x01b468, 1);
+	graphics.moveTo(origin[0] + i * xOffset ,origin[1]);
+	graphics.lineTo(origin[0] + i * xOffset ,origin[1] + height);
+}
+//y輔助線
+for(var i=0; i<9; i++)
+{
+	graphics.lineStyle(2, 0x01b468, 1);
+	graphics.moveTo(origin[0],origin[1]+yOffset + i*yOffset + 10);
+	graphics.lineTo(origin[0]+width,origin[1]+yOffset + i*yOffset + 10);
+}
+
+//設定標題文字
+var TitleText = new PIXI.Text('時序叢線圖');
+TitleText.x = 550;
+TitleText.y = 550;
+app.stage.addChild(TitleText);
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~以上為不會變動的底圖
+
+//設定x軸文字
+var style = new PIXI.TextStyle({
+    fontFamily: 'Arial',
+    fontSize: 16,
+    fontStyle: 'oblique',
+    fontWeight: 'bold',
+    wordWrap: true,
+    wordWrapWidth: 440
+});
+		// ~~for test
+var xIndex = 0;
+		//~~end for test
+
+
+
+var stationText = []; // x軸的文字，暫時設8個區間
+for(var i=0; i<8; i++)
+{
+	stationText[i] = new PIXI.Text(XasixValue[0][xIndex + i], style);
+	stationText[i].x = origin[0]+25 + i*xOffset;
+	stationText[i].y = origin[1]-65;
+	stationText[i].rotation += 0.7;
+	app.stage.addChild(stationText[i]);
+}
+
+//設定y軸文字
+		// ~~for test
+var yIndex = 0;
+		//~~end for test
+var timeText = []; // y軸的文字，暫時設9個區間
+for(var i=0; i<9; i++)
+{
+	timeText[i] = new PIXI.Text(YasixValue[yIndex + i], style);
+	timeText[i].x = origin[0]-50;
+	timeText[i].y = origin[1] + (i+1)*yOffset;
+	app.stage.addChild(timeText[i]);
+}
+
+// X右移點擊
+var X_rightMove = new PIXI.Graphics();
+
+X_rightMove.beginFill(0xFF3300); X_rightMove.lineStyle(0, 0xffd900, 1);
+X_rightMove.moveTo(730,70); X_rightMove.lineTo(745,70); X_rightMove.lineTo(745,60);
+X_rightMove.lineTo(760,78); X_rightMove.lineTo(745,95); X_rightMove.lineTo(745,85);
+X_rightMove.lineTo(730,85); X_rightMove.lineTo(730,70); X_rightMove.endFill();
+X_rightMove.interactive = true;
+X_rightMove.buttonMode = true;
+app.stage.addChild(X_rightMove);
+X_rightMove.click = function (e) {
+	xIndex++;
+	for(var i=0; i<8; i++)
+	{
+		stationText[i].setText(XasixValue[0][xIndex + i]);
+
+	}
+	drawData();
+}
+
+// X左移點擊
+var X_leftMove = new PIXI.Graphics();
+
+X_leftMove.beginFill(0xFF3300); X_leftMove.lineStyle(0, 0xffd900, 1);
+X_leftMove.moveTo(70,70); X_leftMove.lineTo(55,70); X_leftMove.lineTo(55,60);
+X_leftMove.lineTo(40,78); X_leftMove.lineTo(55,95); X_leftMove.lineTo(55,85);
+X_leftMove.lineTo(70,85); X_leftMove.lineTo(70,70); X_leftMove.endFill();
+X_leftMove.interactive = true;
+X_leftMove.buttonMode = true;
+app.stage.addChild(X_leftMove);
+X_leftMove.click = function (e) {
+	if(xIndex>0)
+	{
+		xIndex--;
+		for(var i=0; i<8; i++)
+		{
+			stationText[i].setText(XasixValue[0][xIndex + i]);
+		}
+		drawData();
+	}
+}
+
+// ~~~測試資料~~
+drawData();
+function drawData()
+{
+	dataGroup.clear();
+	app.stage.addChild(dataGroup);
+	for(var i=0; i<+8; i++ )
+	{
+		if(testData2[0].Station==XasixValue[0][xIndex+i]) // 如果頭符合邊界
+		{
+			dataGroup.lineStyle(3, 0x2828ff, 1);
+			dataGroup.moveTo(origin[0] + (i+1)*xOffset,
+				origin[1]+yOffset + 10 + (testData2[0].time.split(":")[0]*60 +testData2[0].time.split(":")[1])/10 * yOffset);
+			//   do somethinig~~
+
+			for(var j=1; j<testData2.length; j++)
+			{
+				dataGroup.lineTo(origin[0] + (i+1+j)* xOffset,
+					origin[1]+yOffset + 10 + (testData2[j].time.split(":")[0]*60 +testData2[j].time.split(":")[1])/10 * yOffset);
+			}
+			// end do something
+			break;
+		}
+	}
+}
+
+
+    </script>
+
+  </body>
+</head>
+
+
